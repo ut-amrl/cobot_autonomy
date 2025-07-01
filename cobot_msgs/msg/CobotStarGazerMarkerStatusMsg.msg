@@ -1,0 +1,4 @@
+uint16 id
+CobotStarGazerMarkerMsg last_msg
+builtin_interfaces/Time first_seen
+uint16 count

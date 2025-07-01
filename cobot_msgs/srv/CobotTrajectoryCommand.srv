@@ -1,0 +1,44 @@
+cobot_msgs/Trajectory2D trajectory
+float32 distance_tolerance
+float32 angle_tolerance
+# If true, use localization estimates for servoing to trajectory, else
+# use only odometry.
+bool use_localization
+bool preemptive
+
+# Obstacle Avoidance types:
+# No Obstacle avoidance.
+int32 OBSTAVNONE = 0
+# Stop if the path is blocked.
+int32 OBSTAVSTOP = 1
+# Normal obstacle avoidance.
+int32 OBSTAVNORMAL = 2
+
+int32 obstacle_avoidance_mode
+
+float32 min_clear_path
+
+# Coordinate type specification options:
+# The coordinates are specified in the global reference frame.
+int32 COORDINATESGLOBAL = 0
+# The coordinates are relative to the starting location of the robot.
+int32 COORDINATESRELATIVE = 1
+
+int32 coordinates_type
+
+# If true, the first element of trajectory is used to reset odometry
+bool reset_odometry
+
+---
+# Const values used to report errors.
+int32 SUCCESS = 0
+# The robot is in the wrong mode to execute this command.
+int32 ERRORWRONGMODE = 1
+# The robot is currently navigating and preemptive is set to false.
+int32 ERRORBUSY = 2
+# Navigation returned an error when trying to set trajectory.
+int32 ERRORNAV = 3
+# The parameters are invalid.
+int32 ERRORINVALID = 4
+# No error.
+int32 error_code

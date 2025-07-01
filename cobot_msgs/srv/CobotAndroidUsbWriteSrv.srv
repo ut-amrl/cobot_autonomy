@@ -1,0 +1,5 @@
+CobotAndroidUsbMsg msg
+
+---
+
+int32 status

@@ -1,0 +1,6 @@
+CobotTaskMsg[] mission_list
+bool server_list
+
+---
+
+int32 received

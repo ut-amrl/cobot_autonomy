@@ -1,0 +1,23 @@
+int32 mission_id
+string current_task
+string current_subtask
+string current_navigationsubtask
+float32 time_blocked
+float32 task_duration
+float32 sub_taskduration
+float32 navigation_subtaskduration
+float32 navigation_timeremaining
+float32 time_todeadline
+
+CobotLocalizationMsg current_destination
+string from_location
+string to_location
+string object_tofind
+
+bool carrying_object
+bool navigating
+bool task_completed
+int32 success_value
+
+bool paused
+string owner

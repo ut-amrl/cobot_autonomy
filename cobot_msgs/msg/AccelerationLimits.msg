@@ -1,0 +1,2 @@
+float32 max_acceleration
+float32 max_speed

@@ -1,0 +1,2 @@
+CobotLocalizationMsg location
+CobotStarGazerMsg raw_stargazer

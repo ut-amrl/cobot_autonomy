@@ -1,0 +1,2 @@
+cobot_msgs/AccelerationLimits translation
+cobot_msgs/AccelerationLimits rotation

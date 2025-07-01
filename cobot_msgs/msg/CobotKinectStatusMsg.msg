@@ -1,0 +1,5 @@
+std_msgs/Header header
+float64 plane_filteringtime
+int32 num_sampledlocations
+int32 num_planarpoints
+int32 num_nonplanarpoints

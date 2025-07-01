@@ -1,0 +1,31 @@
+
+# The following parameters are used to set the 3D location and orientation
+float32 loc_x
+float32 loc_y
+float32 loc_z
+float32 orientation_w
+float32 orientation_x
+float32 orientation_y
+float32 orientation_z
+string map
+
+---
+
+float32 loc_x
+float32 loc_y
+float32 loc_z
+float32 orientation_w
+float32 orientation_x
+float32 orientation_y
+float32 orientation_z
+string map
+
+float32[] particles_x
+float32[] particles_y
+float32[] particles_z
+float32[] particles_orientation_w
+float32[] particles_orientation_x
+float32[] particles_orientation_y
+float32[] particles_orientation_z
+float32[] particles_weight
+

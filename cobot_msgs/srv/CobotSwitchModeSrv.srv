@@ -1,0 +1,5 @@
+# mode values match CobotModeMsg.  Negative motion_scale values are ignored.
+int16 mode
+float64 motion_scale
+
+---

@@ -1,0 +1,8 @@
+string task
+string object
+string from_room
+string to_room
+
+---
+
+int32 received

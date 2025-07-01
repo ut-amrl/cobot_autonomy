@@ -1,0 +1,13 @@
+std_msgs/Header header
+
+float32 velocity_x
+float32 velocity_y
+float32 velocity_r
+
+float32 trans_maxacceleration
+float32 trans_maxdeceleration
+float32 trans_maxvelocity
+
+float32 rot_maxacceleration
+float32 rot_maxdeceleration
+float32 rot_maxvelocity
