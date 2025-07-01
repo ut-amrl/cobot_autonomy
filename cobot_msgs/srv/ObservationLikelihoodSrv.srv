@@ -1,0 +1,10 @@
+# Given a list of possible robot poses @poses and a 
+# LaserScan @scan, returns
+# a corresponding list @probs of probabilities of observing
+# @scan from each of the poses in @poses.
+
+geometry_msgs/Pose2D[] poses    #list of potential robot poses
+
+sensor_msgs/LaserScan scan    #laser scanner observation
+---
+float64[] probs       #list of observation probabilities

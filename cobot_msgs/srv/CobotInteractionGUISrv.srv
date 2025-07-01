@@ -1,0 +1,9 @@
+int8 question_id
+string screen_title
+string screen_text
+string[] button_text
+string speech_text
+
+---
+
+bool success

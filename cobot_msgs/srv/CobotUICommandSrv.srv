@@ -1,0 +1,16 @@
+#valid commands:
+# 0: Show password interface. A list of valid passwords should be sent in s_params. The result field returns 0 if the entered password is valid, 1 if it is valid 
+# 1: Launch localization gui. 
+#       f_params[0] = X location to be displayed at center
+#       f_params[1] = Y location to be displayed at center
+#       f_params[2] = zoom level
+
+
+int8 command
+
+float32[] f_params
+string[] s_params
+
+---
+
+int8 result

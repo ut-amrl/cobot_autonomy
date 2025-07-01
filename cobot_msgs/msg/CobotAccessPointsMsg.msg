@@ -1,0 +1,1 @@
+CobotWifiMsg[] access_points

@@ -1,0 +1,21 @@
+float64 time_stamp
+float32 x
+float32 y
+float32 angle
+float64 angle_uncertainty
+float64 location_uncertainty
+string map
+
+float64 last_laserruntime
+float64 laser_runtime
+int32 laser_numobservedpoints
+int32 laser_numcorrespondences
+float64 laser_stage0weights
+float64 laser_stagerweights
+
+float64 last_pointcloudruntime
+float64 point_cloudruntime
+int32 point_cloudnumobservedpoints
+int32 point_cloudnumcorrespondences
+float64 point_cloudstage0weights
+float64 point_cloudstagerweights

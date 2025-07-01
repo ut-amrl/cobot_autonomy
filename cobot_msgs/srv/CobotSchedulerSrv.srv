@@ -1,0 +1,11 @@
+string task_name
+CobotParameterMsg[] task_params
+string window_start
+string window_end
+string robot
+bool alternatives
+---
+int32 ret
+string alternative_start
+string alternative_end
+

@@ -1,0 +1,5 @@
+string response
+
+---
+
+int8 err_code
