@@ -262,13 +262,16 @@ class SpaceMouse:
                         self.left_click_and_hold = True
 
                     # release left/right button
-                    if d[1] == 0:
+                    elif d[1] == 0:
                         self.left_click_and_hold = False
                         self.right_click_and_hold = False
 
                     # press right button
-                    if d[1] == 2:
+                    elif d[1] == 2:
                         self.right_click_and_hold = True
+                        
+                    else:
+                        print("Unknown button state: {}".format(d[1]))
 
     @property
     def control(self):
