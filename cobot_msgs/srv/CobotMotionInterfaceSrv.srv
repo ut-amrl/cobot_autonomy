@@ -1,0 +1,10 @@
+float32 drive_x #Distance to move along x in meters
+float32 drive_y #Distance to move along y in meters
+float32 drive_r #Distance to turn in radians
+float32 max_vel_trans # Maximum Translation Velocity
+float32 max_vel_rot #Maximum Rotation Velocity
+
+---
+
+int8 err_code
+

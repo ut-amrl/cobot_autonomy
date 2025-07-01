@@ -1,0 +1,11 @@
+# Given a state as @x, @y, @angle and @map_name, returns the expected
+# @laser_scan to see from that location. Returns a full 360 degree
+# view, as if the robot were pointing in the positive x direction.
+
+
+float64 x                           #robot x coordinate
+float64 y                           #robot y coordinate
+float64 angle                       #robot angle
+string map_name                     #name of the map for robot x,y
+---
+sensor_msgs/LaserScan laser_scan    #expected laser scanner observation

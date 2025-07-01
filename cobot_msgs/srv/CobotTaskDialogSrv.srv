@@ -1,0 +1,9 @@
+string task
+string name
+string dest
+string currloc
+string subtask
+
+---
+
+int8 err_code

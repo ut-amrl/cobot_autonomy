@@ -1,0 +1,6 @@
+string speech_text
+
+---
+
+int8 err_code
+string pending_speech

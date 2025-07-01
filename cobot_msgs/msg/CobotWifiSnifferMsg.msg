@@ -1,0 +1,16 @@
+float64 ros_time
+float64 frame_time
+int32 frame_number
+int32 frame_len
+int64 source_address
+int64 destination_address
+int64 bssid
+int32 rssi
+float32 datarate
+int32 beacon_channel
+int32 channel_freq
+int8 channel_type
+string ssid
+int16 channel_primary
+int8 channel_secondary_offset
+int8 channel_secondary_width

@@ -1,0 +1,11 @@
+string question
+
+bool multiple_choice
+bool click_image
+
+string[] choices
+string image
+
+---
+
+int8 err_code
