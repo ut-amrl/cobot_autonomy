@@ -28,8 +28,8 @@ CobotDrive* cobotDrive;
 float min_angular_velocity_request = RAD(5.0);
 float min_angular_velocity_command = 0.0;
 float motionScale = 1.0;
-static const float MaxJoystickTransSpeed = 1.7; // 1.5
-static const float MaxJoystickAngSpeed = 1.3 * M_PI; // 1.0 * M_PI
+static const float MaxJoystickTransSpeed = 1.5; // 1.5
+static const float MaxJoystickAngSpeed = 1.0 * M_PI; // 1.0 * M_PI
 
 uint64_t _joystickButtons;
 std::deque<float> _joystickAxes;
