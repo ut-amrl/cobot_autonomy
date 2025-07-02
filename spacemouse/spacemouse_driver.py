@@ -81,7 +81,7 @@ def input2action(device, controller_type="OSC_POSE", robot_name="Panda", gripper
     dpos *= 200
     drotation = drotation
 
-    grasp = 1 if grasp else 0
+    grasp = 1 if grasp else -1
     action = np.concatenate([dpos, drotation, [grasp] * gripper_dof])
 
     return action, grasp, switch_mode
@@ -94,8 +94,11 @@ class Mode(Enum):
 
     # repeat [1, 2..., end -> start]
     def next(self):
-        n = len(list(self.__class__))
-        return Mode(self.value + 1 if self.value < n - 1 else 0)
+        members = list(self.__class__)
+        next_index = (self.value) % len(members) + 1
+        if next_index > len(members):
+            next_index = 1
+        return Mode(next_index)
 
 class SpaceMouseInterface(Node):
     def __init__(self, 
@@ -192,8 +195,6 @@ class SpaceMouseInterface(Node):
 
             if right_click:
                 self.action_right_click()
-            elif left_click:
-                self.action_left_click()
             else:
                 # for now we handle the left click behavior in dofs
                 self.action_dofs(dofs)
