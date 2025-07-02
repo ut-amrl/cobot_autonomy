@@ -6,7 +6,7 @@ import numpy as np
 
 # kinova arm imports
 from utils.arm_utils import parseConnectionArguments, DeviceConnection
-from utils.arm_utils import send_gripper_action, send_cartesion_twist
+from utils.arm_utils import send_gripper_action, send_cartesian_twist
 from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
 from kortex_api.autogen.messages import Base_pb2
 
@@ -81,7 +81,7 @@ def input2action(device, controller_type="OSC_POSE", robot_name="Panda", gripper
     dpos *= 200
     drotation = drotation
 
-    grasp = 1 if grasp else -1
+    grasp = 1 if grasp else 0
     action = np.concatenate([dpos, drotation, [grasp] * gripper_dof])
 
     return action, grasp, switch_mode
@@ -165,7 +165,7 @@ class SpaceMouseInterface(Node):
                     self.gripper_opened = not self.gripper_opened
                 else:
                     # self.cobot.apply_arm_action(dofs, type="twist")
-                    send_cartesion_twist(self.arm_base_client, dofs)
+                    send_cartesian_twist(self.arm_base_client, dofs)
                     
         elif self.mode == Mode.AUTONOMOUS: 
             pass # autonomous mode not implemented yet
@@ -218,8 +218,8 @@ if __name__ == "__main__":
     else:
         print("SpaceMouse device not found.")
         exit(1)
-    space_mouse = SpaceMouse(vendor_id=vendor_id, product_id=product_id)
-    space_mouse.start_control()
+    spacemouse = SpaceMouse(vendor_id=vendor_id, product_id=product_id)
+    spacemouse.start_control()
     
     # Set up arm connection
     # Note (Taijing): This connection skip ros
