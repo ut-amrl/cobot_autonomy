@@ -306,10 +306,3 @@ class SpaceMouse:
         if self.right_click_and_hold:
             return 1.0
         return 0
-
-
-if __name__ == "__main__":
-    space_mouse = SpaceMouse(product_id=50770)
-    for i in range(100):
-        print(space_mouse.control, space_mouse.control_gripper)
-        time.sleep(0.02)
