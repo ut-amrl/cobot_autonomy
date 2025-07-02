@@ -348,6 +348,9 @@ void CobotDrive::SerialSend() {
   mspcommand.rspeed = bound(motorProps.rotMotionScale*rotSpeed, -30000, 30000);
   double packetLen = makercpacket(&mspcommand, commandBuffer);
   if (debug) {
+    std::cout << mspcommand.xspeed << " "
+              << mspcommand.yspeed << " "
+              << mspcommand.rspeed << std::endl;
     for(int i=0; i<packetLen; i++)
       printf("0x%02X, ",commandBuffer[i]);
     printf("\n");
