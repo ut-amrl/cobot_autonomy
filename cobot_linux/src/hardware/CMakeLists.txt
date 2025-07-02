@@ -9,6 +9,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(cobot_msgs REQUIRED)
 
 # Include shared headers
 include_directories(
