@@ -224,8 +224,9 @@ if __name__ == "__main__":
     # Set up arm connection
     # Note (Taijing): This connection skip ros
     args = parseConnectionArguments()
-    arm_router = None
+    
+    rclpy.init()
     with DeviceConnection.createTcpConnection(args) as arm_router:
         driver = SpaceMouseInterface(spacemouse, arm_router)
         driver.run()
-    
+    rclpy.shutdown()
