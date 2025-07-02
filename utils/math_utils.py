@@ -116,3 +116,72 @@ def rotation_matrix(angle, direction, point=None):
         point = np.array(point[:3], dtype=np.float32, copy=False)
         M[:3, 3] = point - np.dot(R, point)
     return M
+
+def run_1d_time_optimal_control(
+    x_now: float, 
+    v_now: float, 
+    x_final: float, 
+    dt: float,
+    # TODO: make these configurable
+    a_max: float = 0.5, 
+    d_max: float = 0.5, 
+    v_max: float = 0.5,
+):
+    """
+    Time-optimal 1D velocity command for a point-mass system.
+    Assumes discrete-time kinematic model with bounded acceleration and speed.
+    
+    Args:
+        x_now (float): current position
+        v_now (float): current velocity
+        x_final (float): target position
+        v_final (float): target velocity (default 0.0)
+        dt (float): time step
+    
+    Returns:
+        velocity_cmd (float): target velocity for next step
+    """
+    # Direction-aware setup
+    dx = x_final - x_now
+    dir_sign = math.copysign(1.0, dx) if dx != 0 else 0.0
+    speed = abs(v_now)
+    dist_left = abs(dx)
+
+    # Velocity deltas per time step
+    dv_a = a_max * dt
+    dv_d = d_max * dt
+
+    # Approximate stopping distance assuming constant deceleration
+    # d = v^2 / (2*a), add one dt worth of motion for conservativeness
+    stopping_dist = speed * dt + (speed ** 2) / (2.0 * d_max)
+
+    # Decide control phase
+    if dist_left > 1e-4:  # far enough from goal
+        if speed > v_max + 1e-4:
+            # Over speed, must slow down
+            phase = 'O'
+            speed_next = max(0.0, speed - dv_d)
+        elif stopping_dist < dist_left:
+            # Can safely accelerate
+            phase = 'A'
+            speed_next = min(v_max, speed + dv_a)
+        elif speed > 1e-4:
+            # Too close to accelerate, start decelerating
+            phase = 'D'
+            speed_next = max(0.0, speed - dv_d)
+        else:
+            # Already at rest near target
+            phase = 'Z'
+            speed_next = 0.0
+    elif speed > 1e-4:
+        # Passed goal or exactly at goal, but still moving
+        phase = 'X'
+        speed_next = max(0.0, speed - dv_d)
+    else:
+        phase = 'Z'
+        speed_next = 0.0
+
+    # Direction-aware velocity command
+    velocity_cmd = dir_sign * speed_next
+
+    return velocity_cmd
