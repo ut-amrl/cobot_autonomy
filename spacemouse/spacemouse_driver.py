@@ -5,7 +5,10 @@ from enum import Enum, auto
 import numpy as np
 
 # kinova arm imports
-from utils.gen3_utils import parseConnectionArguments, DeviceConnection
+from utils.arm_utils import parseConnectionArguments, DeviceConnection
+from utils.arm_utils import send_gripper_action, send_cartesion_twist
+from kortex_api.autogen.client_stubs.BaseClientRpc import BaseClient
+from kortex_api.autogen.messages import Base_pb2
 
 # ros imports
 import rclpy
@@ -14,7 +17,6 @@ from cobot_msgs.msg import CobotJoystickMsg
 
 # custom imports
 from spacemouse import SpaceMouse
-from cobot_python.cobot import Cobot
 
 GRIPPER_DIM = -1
 ARM_SCALE_TRANSLATION = 3.0  # current maximum: 3.0
@@ -95,11 +97,34 @@ class Mode(Enum):
         n = len(list(self.__class__))
         return Mode(self.value + 1 if self.value < n - 1 else 0)
 
-class SpaceMouseInterface:
-    def __init__(self, space_mouse: SpaceMouse, cobot: Cobot):
+class SpaceMouseInterface(Node):
+    def __init__(self, 
+                 space_mouse: SpaceMouse, 
+                 arm_router: DeviceConnection,
+                 gripper_opened: bool = True, # TODO: this should be read from gripper state
+    ):
+        super().__init__('spacemouse_driver')
         self.space_mouse = space_mouse
-        self.cobot = cobot
+        
+        # Set up arm connection
+        # Note (Taijing): This connection skips ros
+        self.arm_base_client = BaseClient(arm_router)
+        base_servo_mode = Base_pb2.ServoingModeInformation()
+        base_servo_mode.servoing_mode = Base_pb2.SINGLE_LEVEL_SERVOING
+        self.arm_base_client.SetServoingMode(base_servo_mode)
+        
+        # TODO: this should be read from gripper state
+        self.gripper_opened = gripper_opened
         self.mode = Mode.STOPPED
+        
+        self._setup_publisher()
+        
+    def _setup_publisher(self):
+        self.joystick_pub = self.create_publisher(
+            CobotJoystickMsg,
+            '/Cobot/Joystick/Dummy',  # topic name
+            10  # QoS queue depth
+        )
         
     def action_dofs(self, dofs):
         # stop mode
@@ -115,8 +140,16 @@ class SpaceMouseInterface:
                 x = dofs[0]
                 y = dofs[1]
                 r = -dofs[5]
-                # TODO
+                
                 # self.cobot.apply_base_drive(x=x, y=y, r=r)
+                NumAxes = 5 # Note (Taijing): I don't understand why this is 5, but it works with the current joystick message
+                joystickMsg = CobotJoystickMsg()
+                joystickMsg.buttons = 0x0
+                joystickMsg.axes = [0.0 for _ in range(NumAxes)]
+                joystickMsg.axes[0] = x
+                joystickMsg.axes[1] = y
+                joystickMsg.axes[2] = r
+                self.joystick_pub.publish(joystickMsg)
 
         # manipulation mode (arm)
         elif self.mode == Mode.MANUAL_ARM: 
@@ -127,13 +160,12 @@ class SpaceMouseInterface:
 
             if check_valid_action(dofs, use_gripper=True):
                 if dofs[GRIPPER_DIM] == 1.0:  # button clicked
-                    # TODO
                     # self.cobot.apply_gripper_action(1.0 if self.gripper_opened else 0.0)
-                    self.gripper_opened = False if self.gripper_opened else True
+                    send_gripper_action(self.arm_base_client, 1.0 if self.gripper_opened else 0.0)
+                    self.gripper_opened = not self.gripper_opened
                 else:
-                    # TODO
                     # self.cobot.apply_arm_action(dofs, type="twist")
-                    pass
+                    send_cartesion_twist(self.arm_base_client, dofs)
                     
         elif self.mode == Mode.AUTONOMOUS: 
             pass # autonomous mode not implemented yet
@@ -160,6 +192,8 @@ class SpaceMouseInterface:
 
             if right_click:
                 self.action_right_click()
+            elif left_click:
+                self.action_left_click()
             else:
                 # for now we handle the left click behavior in dofs
                 self.action_dofs(dofs)
@@ -188,11 +222,10 @@ if __name__ == "__main__":
     space_mouse.start_control()
     
     # Set up arm connection
-    # Note: This connection skip ros
+    # Note (Taijing): This connection skip ros
     args = parseConnectionArguments()
-    with DeviceConnection.createTcpConnection(args) as router:
-        cobot = Cobot(router=router)
-    
-    driver = SpaceMouseInterface(spacemouse, cobot)
-    driver.run()
+    arm_router = None
+    with DeviceConnection.createTcpConnection(args) as arm_router:
+        driver = SpaceMouseInterface(spacemouse, arm_router)
+        driver.run()
     
