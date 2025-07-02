@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>cobot_linux</name>
+  <version>0.0.1</version>
+  <description>Top-level package for cobot_linux</description>
+  <maintainer email="taijingchen@utexas.edu">Taijing Chen</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+</package>
