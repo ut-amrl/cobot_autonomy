@@ -28,8 +28,8 @@ CobotDrive* cobotDrive;
 float min_angular_velocity_request = RAD(5.0);
 float min_angular_velocity_command = 0.0;
 float motionScale = 1.0;
-static const float MaxJoystickTransSpeed = 1.5;
-static const float MaxJoystickAngSpeed = 1.0 * M_PI;
+static const float MaxJoystickTransSpeed = 1.7; // 1.5
+static const float MaxJoystickAngSpeed = 1.3 * M_PI; // 1.0 * M_PI
 
 uint64_t _joystickButtons;
 std::deque<float> _joystickAxes;
@@ -153,10 +153,10 @@ void getSpaceMouseCommand(vector2f *transDesired,
 
 
 void timerEvent(int sig) {
-    const bool debugTimer = false;
+    const bool debug = false;
     static double tLast = GetTimeSec();
     static double tLastOdometry = GetTimeSec();
-    if(debugTimer){
+    if(debug){
         printf( "dT = %f\n", GetTimeSec()-tLast );
         tLast = GetTimeSec();
     }
@@ -166,6 +166,14 @@ void timerEvent(int sig) {
     getSpaceMouseCommand(&desiredTransVel, &desiredRotVel);
     desiredTransVel = motionScale * MaxJoystickTransSpeed * desiredTransVel;
     desiredRotVel = motionScale * MaxJoystickAngSpeed * desiredRotVel;
+
+    if (debug) {
+        std::cout << "Desired Translation Velocity: " 
+              << desiredTransVel.x << ", " 
+              << desiredTransVel.y << std::endl;
+        std::cout << "Desired Rotation Velocity: " 
+                << desiredRotVel << std::endl;
+    }
 
     float ang_vel_cmd = desiredRotVel;
     if (fabs(ang_vel_cmd) > min_angular_velocity_request &&
