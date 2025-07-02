@@ -1,5 +1,6 @@
 *__pycache__*
 *build*
+cobot_linux/bin
 cobot_msgs/install
 cobot_msgs/log
 
