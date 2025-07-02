@@ -1,5 +1,8 @@
+*.vscode
 *__pycache__*
 *build*
+cobot_linux/bin
+cobot_linux/lib
 cobot_msgs/install
 cobot_msgs/log
 

@@ -125,7 +125,7 @@ class SpaceMouseInterface(Node):
     def _setup_publisher(self):
         self.joystick_pub = self.create_publisher(
             CobotJoystickMsg,
-            '/Cobot/Joystick/Dummy',  # topic name
+            '/Cobot/Joystick',  # topic name
             10  # QoS queue depth
         )
         
