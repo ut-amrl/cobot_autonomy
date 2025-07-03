@@ -165,7 +165,7 @@ void timerEvent(int sig) {
         printf( "dT = %f\n", GetTimeSec()-tLast );
         tLast = GetTimeSec();
     }
-
+    cobotDrive->run();
     
     double dr,dx,dy,v0,v1,v2,v3,vr,vx,vy,adc,curAngle;
     unsigned char status;
