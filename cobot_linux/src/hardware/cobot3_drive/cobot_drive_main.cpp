@@ -36,6 +36,11 @@ std::deque<float> _joystickAxes;
 double _lastJoystickRcvT;
 pthread_mutex_t _joystickMutex;
 
+std::shared_ptr<rclcpp::Node> node;
+rclcpp::Publisher<cobot_msgs::msg::CobotOdometryMsg>::SharedPtr cobot_odometry_pub;
+rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub;
+std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster;
+
 std::string expandUser(const std::string& path) {
     if (path.rfind("~/", 0) == 0) {
         const char* home = getenv("HOME");
@@ -160,7 +165,99 @@ void timerEvent(int sig) {
         printf( "dT = %f\n", GetTimeSec()-tLast );
         tLast = GetTimeSec();
     }
-    // cobotDrive->setSpeeds(0.5, 0.0, 0.0); // Example speeds, replace with actual logic
+
+    
+    double dr,dx,dy,v0,v1,v2,v3,vr,vx,vy,adc,curAngle;
+    unsigned char status;
+    vector2d curLoc;
+    if (cobotDrive->GetFeedback(
+      dr,dx,dy,v0,v1,v2,v3,vr,vx,vy,adc,status,curLoc,curAngle)){
+
+        if(flipEStop){
+        status = status ^ 0x04;
+        }
+        if ((status & 0x01) != 0) {
+        status = status & 0xFB;
+        } else {
+        status = status | 0x04;
+        }
+
+        cobot_msgs::msg::CobotOdometryMsg cobotOdometryMsg;
+        cobotOdometryMsg.dr = dr;
+        cobotOdometryMsg.dx = dx;
+        cobotOdometryMsg.dy = dy;
+        cobotOdometryMsg.v0 = v0;
+        cobotOdometryMsg.v1 = v1;
+        cobotOdometryMsg.v2 = v2;
+        cobotOdometryMsg.v3 = v3;
+        cobotOdometryMsg.vr = vr;
+        cobotOdometryMsg.vx = vx;
+        cobotOdometryMsg.vy = vy;
+        cobotOdometryMsg.v_batt = adc;
+        cobotOdometryMsg.header.stamp = node->get_clock()->now();
+        cobotOdometryMsg.header.frame_id = "odom";
+        cobotOdometryMsg.status = status;
+
+        nav_msgs::msg::Odometry odometryMsg;
+        odometryMsg.header.stamp = node->get_clock()->now();
+        odometryMsg.header.frame_id = "odom";
+        odometryMsg.child_frame_id = "base_footprint";
+        odometryMsg.pose.pose.position.x = curLoc.x;
+        odometryMsg.pose.pose.position.y = curLoc.y;
+        odometryMsg.pose.pose.position.z = 0;
+        odometryMsg.pose.pose.orientation.w = cos(curAngle*0.5);
+        odometryMsg.pose.pose.orientation.x = 0;
+        odometryMsg.pose.pose.orientation.y = 0;
+        odometryMsg.pose.pose.orientation.z = sin(curAngle*0.5);
+        odometryMsg.twist.twist.angular.x = 0;
+        odometryMsg.twist.twist.angular.y = 0;
+        odometryMsg.twist.twist.angular.z = vr;
+        odometryMsg.twist.twist.linear.x = vx;
+        odometryMsg.twist.twist.linear.y = vy;
+        odometryMsg.twist.twist.linear.z = 0;
+
+        double dT = GetTimeSec() - tLastOdometry;
+        tLastOdometry = GetTimeSec();
+        static const double MaxTransSpeed = 3.0;
+        static const double MaxRotSpeed = 360.0;
+        if((sq(dx)+sq(dy))>sq(MaxTransSpeed/dT) || fabs(dr)>RAD(MaxRotSpeed/dT)){
+            TerminalWarning("Odometry out of bounds! Dropping odometry packet.");
+        } else {
+            cobot_odometry_pub->publish(cobotOdometryMsg);
+
+            // --- transform: odom -> base_footprint ---
+            geometry_msgs::msg::TransformStamped tf_odom_to_base;
+            tf_odom_to_base.header.stamp = node->get_clock()->now();
+            tf_odom_to_base.header.frame_id = "odom";
+            tf_odom_to_base.child_frame_id = "base_footprint";
+            tf_odom_to_base.transform.translation.x = curLoc.x;
+            tf_odom_to_base.transform.translation.y = curLoc.y;
+            tf_odom_to_base.transform.translation.z = 0.0;
+            tf_odom_to_base.transform.rotation.x = 0.0;
+            tf_odom_to_base.transform.rotation.y = 0.0;
+            tf_odom_to_base.transform.rotation.z = sin(curAngle * 0.5);
+            tf_odom_to_base.transform.rotation.w = cos(curAngle * 0.5);
+            tf_broadcaster->sendTransform(tf_odom_to_base);
+
+            // --- transform: base_footprint -> base_link ---
+            geometry_msgs::msg::TransformStamped tf_base_to_link;
+            tf_base_to_link.header.stamp = node->get_clock()->now();
+            tf_base_to_link.header.frame_id = "base_footprint";
+            tf_base_to_link.child_frame_id = "base_link";
+            tf_base_to_link.transform.translation.x = 0.0;
+            tf_base_to_link.transform.translation.y = 0.0;
+            tf_base_to_link.transform.translation.z = 0.0;
+            tf_base_to_link.transform.rotation.x = 0.0;
+            tf_base_to_link.transform.rotation.y = 0.0;
+            tf_base_to_link.transform.rotation.z = 0.0;
+            tf_base_to_link.transform.rotation.w = 1.0;
+            tf_broadcaster->sendTransform(tf_base_to_link);
+
+            odom_pub->publish(odometryMsg);
+        }
+    }
+
+    // TODO this should belongs to joystickCallback?
     vector2f desiredTransVel;
     float desiredRotVel;
     getSpaceMouseCommand(&desiredTransVel, &desiredRotVel);
@@ -181,7 +278,6 @@ void timerEvent(int sig) {
         ang_vel_cmd = sign<float>(ang_vel_cmd) * min_angular_velocity_command;
     }
     cobotDrive->setSpeeds(desiredTransVel.x, desiredTransVel.y, ang_vel_cmd);
-    cobotDrive->run();
 
     if( !run ){
         CancelTimerInterrupts();
@@ -233,7 +329,13 @@ int main(int argc, char **argv) {
     }
 
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<rclcpp::Node>("Cobot3_Drive_Module");
+    node = std::make_shared<rclcpp::Node>("Cobot3_Drive_Module");
+
+    cobot_odometry_pub = node->create_publisher<cobot_msgs::msg::CobotOdometryMsg>(
+        "/Cobot/Odometry", 10);
+    odom_pub = node->create_publisher<nav_msgs::msg::Odometry>(
+        "/odom", 10);
+    tf_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(node);
 
     auto joystick_sub = node->create_subscription<cobot_msgs::msg::CobotJoystickMsg>(
         "/Cobot/Joystick", 10, joystickCallback);
