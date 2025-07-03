@@ -22,21 +22,6 @@ make
 cd ..
 ```
 
-# Teleop
-In one terminal, run:
-```
-cd cobot_linux && ./bin/cobot3_drive
-```
-In another terminal:
-```
-python spacemouse/spacemouse_driver.py
-```
-
-# Lidar
-```
-ros2 run urg_node urg_node_driver --ros-args -p ip_address:=192.168.0.10 -r /scan:=/Cobot/Laser
-```
-
 # Temporary Manual Setup
 *(We'll automate all this later, but for now, just doing manual setup)*
 
@@ -97,6 +82,34 @@ function source_ros2_env() {
 }
 source_ros2_env
 ```
+
+# Teleop
+In one terminal, run:
+```
+cd cobot_linux && ./bin/cobot3_drive
+```
+In another terminal:
+```
+python spacemouse/spacemouse_driver.py
+```
+
+# Lidar
+```
+ros2 run urg_node urg_node_driver --ros-args -p ip_address:=192.168.0.10 -r /scan:=/Cobot/Laser
+```
+
+# Launch WebViz
+1. Copy the webviz configuration template and customize it:
+   ```bash
+   cp webviz/config/webviz_config.lua config/cobot_webviz_config.lua
+   ```
+2. Run the websocket server:
+```bash
+cd webviz && ./bin/websocket --config_file=../config/cobot_webviz_config.lua --v=1
+```
+3. Open a web browser
+4. Load `webviz/webviz.html`
+5. Enter robot IP and click Connect
 
 # Known Issues
 If cobot fails to connect to lidar:
