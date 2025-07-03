@@ -156,6 +156,32 @@ void getSpaceMouseCommand(vector2f *transDesired,
     }
 }
 
+void joystickToDrive() {
+    static const bool debug = false;
+
+    vector2f desiredTransVel;
+    float desiredRotVel;
+    getSpaceMouseCommand(&desiredTransVel, &desiredRotVel);
+
+    desiredTransVel = motionScale * MaxJoystickTransSpeed * desiredTransVel;
+    desiredRotVel = motionScale * MaxJoystickAngSpeed * desiredRotVel;
+
+    if (debug) {
+        std::cout << "Desired Translation Velocity: "
+                  << desiredTransVel.x << ", "
+                  << desiredTransVel.y << std::endl;
+        std::cout << "Desired Rotation Velocity: "
+                  << desiredRotVel << std::endl;
+    }
+
+    float ang_vel_cmd = desiredRotVel;
+    if (fabs(ang_vel_cmd) > min_angular_velocity_request &&
+        fabs(ang_vel_cmd) < min_angular_velocity_command) {
+        ang_vel_cmd = sign<float>(ang_vel_cmd) * min_angular_velocity_command;
+    }
+
+    cobotDrive->setSpeeds(desiredTransVel.x, desiredTransVel.y, ang_vel_cmd);
+}
 
 void timerEvent(int sig) {
     const bool debug = false;
@@ -257,27 +283,7 @@ void timerEvent(int sig) {
         }
     }
 
-    // TODO this should belongs to joystickCallback?
-    vector2f desiredTransVel;
-    float desiredRotVel;
-    getSpaceMouseCommand(&desiredTransVel, &desiredRotVel);
-    desiredTransVel = motionScale * MaxJoystickTransSpeed * desiredTransVel;
-    desiredRotVel = motionScale * MaxJoystickAngSpeed * desiredRotVel;
-
-    if (debug) {
-        std::cout << "Desired Translation Velocity: " 
-              << desiredTransVel.x << ", " 
-              << desiredTransVel.y << std::endl;
-        std::cout << "Desired Rotation Velocity: " 
-                << desiredRotVel << std::endl;
-    }
-
-    float ang_vel_cmd = desiredRotVel;
-    if (fabs(ang_vel_cmd) > min_angular_velocity_request &&
-        fabs(ang_vel_cmd) < min_angular_velocity_command) {
-        ang_vel_cmd = sign<float>(ang_vel_cmd) * min_angular_velocity_command;
-    }
-    cobotDrive->setSpeeds(desiredTransVel.x, desiredTransVel.y, ang_vel_cmd);
+    joystickToDrive();
 
     if( !run ){
         CancelTimerInterrupts();
