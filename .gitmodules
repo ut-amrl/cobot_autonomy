@@ -7,3 +7,6 @@
 [submodule "amrl_maps"]
 	path = amrl_maps
 	url = https://github.com/ut-amrl/amrl_maps.git
+[submodule "enml"]
+	path = enml
+	url = https://github.com/ut-amrl/enml.git
