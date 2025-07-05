@@ -25,39 +25,14 @@ cd ..
 # Temporary Manual Setup
 *(We'll automate all this later, but for now, just doing manual setup)*
 
-## AMRL Messages ROS2 Setup
-1. Add the path to your `~/.bashrc` file for the `AMENT_PREFIX_PATH` environment variable:
-   ```bash
-   echo "export AMENT_PREFIX_PATH=$(pwd)/amrl_msgs/install:\$AMENT_PREFIX_PATH" >> ~/.bashrc
-   source ~/.bashrc
-   ```
-2. Run `make` in the amrl_msgs directory to build and install for ROS2.
-
-## AMRL Maps ROS2 Setup
-1. Add the path to your `~/.bashrc` file for the `AMENT_PREFIX_PATH` environment variable:
-   ```bash
-   echo "export AMENT_PREFIX_PATH=$(pwd)/amrl_maps/install:\$AMENT_PREFIX_PATH" >> ~/.bashrc
-   source ~/.bashrc
-   ```
-2. Run `make` in the amrl_maps directory to build and install for ROS2.
-
-## WebViz ROS2 Setup
-1. Install system dependencies:
-   ```bash
-   sudo apt install build-essential cmake qt5-default libqt5websockets5-dev \
-                    qtbase5-dev qtwebengine5-dev libgoogle-glog-dev libgflags-dev \
-                    colcon-common-extensions libgtest-dev liblua5.1-0-dev
-   ```
-2. Add the path to your `~/.bashrc` file for the `AMENT_PREFIX_PATH` environment variable:
-   ```bash
-   echo "export AMENT_PREFIX_PATH=$(pwd)/webviz/install:\$AMENT_PREFIX_PATH" >> ~/.bashrc
-   source ~/.bashrc
-   ```
-3. Run `make` in the webviz directory to build and install for ROS2.
-
-## Additional Bashrc Setup
-Add this function to your `~/.bashrc` to automatically source all ROS2 packages in AMENT_PREFIX_PATH:
+1. cd to cobot_autonomy root
+2. Add following to `~/.bashrc`
 ```bash
+export AMENT_PREFIX_PATH=$(pwd)/amrl_msgs/install:$AMENT_PREFIX_PATH
+export AMENT_PREFIX_PATH=$(pwd)/amrl_maps/install:$AMENT_PREFIX_PATH
+export AMENT_PREFIX_PATH=$(pwd)/webviz/install:$AMENT_PREFIX_PATH
+export AMENT_PREFIX_PATH=$(pwd)/enml/install:$AMENT_PREFIX_PATH
+
 # Auto-source all ROS2 packages in AMENT_PREFIX_PATH
 function source_ros2_env() {
     if [ -n "$AMENT_PREFIX_PATH" ]; then
@@ -82,6 +57,15 @@ function source_ros2_env() {
 }
 source_ros2_env
 ```
+3. Build all submodules:
+```
+cd cobot_autonomy
+cd amrl_maps && make -j4 && make -j4 && cd ..
+cd amrl_msgs && make -j4 && make -j4 && cd ..
+source ~/.bashrc
+cd webviz && make -j4 && make -j4 && cd ..
+cd enml && make -j4 && make -j4 && cd ..
+```
 
 # Teleop
 In one terminal, run:
@@ -99,17 +83,17 @@ ros2 run urg_node urg_node_driver --ros-args -p ip_address:=192.168.0.10 -r /sca
 ```
 
 # Launch WebViz
-1. Copy the webviz configuration template and customize it:
-   ```bash
-   cp webviz/config/webviz_config.lua config/cobot_webviz_config.lua
-   ```
-2. Run the websocket server:
+1. Run the websocket server:
 ```bash
 cd webviz && ./bin/websocket --config_file=../config/cobot_webviz_config.lua --v=1
 ```
-3. Open a web browser
-4. Load `webviz/webviz.html`
-5. Enter robot IP and click Connect
+2. Open `webviz/webviz.html` in a web browser
+3. Enter robot IP and click Connect
+
+# Launch Enml
+```
+cd enml && ./bin/enml -c ../config -r enml.lua
+```
 
 # Known Issues
 If cobot fails to connect to lidar:
