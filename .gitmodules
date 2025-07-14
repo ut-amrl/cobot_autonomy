@@ -10,3 +10,6 @@
 [submodule "enml"]
 	path = enml
 	url = https://github.com/ut-amrl/enml.git
+[submodule "graph_navigation"]
+	path = graph_navigation
+	url = https://github.com/ut-amrl/graph_navigation.git

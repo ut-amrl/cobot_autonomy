@@ -25,13 +25,14 @@ cd ..
 # Temporary Manual Setup
 *(We'll automate all this later, but for now, just doing manual setup)*
 
-1. cd to cobot_autonomy root
+1. `cd cobot_autonomy`
 2. Add following to `~/.bashrc`
 ```bash
 export AMENT_PREFIX_PATH=$(pwd)/amrl_msgs/install:$AMENT_PREFIX_PATH
 export AMENT_PREFIX_PATH=$(pwd)/amrl_maps/install:$AMENT_PREFIX_PATH
 export AMENT_PREFIX_PATH=$(pwd)/webviz/install:$AMENT_PREFIX_PATH
 export AMENT_PREFIX_PATH=$(pwd)/enml/install:$AMENT_PREFIX_PATH
+export AMENT_PREFIX_PATH=$(pwd)/graph_navigation/install:$AMENT_PREFIX_PATH
 
 # Auto-source all ROS2 packages in AMENT_PREFIX_PATH
 function source_ros2_env() {
@@ -56,15 +57,25 @@ function source_ros2_env() {
     fi
 }
 source_ros2_env
+
+cmdrepeat() {
+  local n=$1; shift
+  for ((i=0; i<n; i++)); do
+    "$@"
+  done
+}
+export -f cmdrepeat
+
 ```
 3. Build all submodules:
 ```
 cd cobot_autonomy
-cd amrl_maps && make -j4 && make -j4 && cd ..
-cd amrl_msgs && make -j4 && make -j4 && cd ..
+cd amrl_maps && cmdrepeat 4 make -j4 && cd ..
+cd amrl_msgs && cmdrepeat 4 make -j4 && cd ..
 source ~/.bashrc
-cd webviz && make -j4 && make -j4 && cd ..
-cd enml && make -j4 && make -j4 && cd ..
+cd webviz && cmdrepeat 4 make -j4 && cd ..
+cd enml && cmdrepeat 4 make -j4 && cd ..
+cd graph_navigation && cmdrepeat 4 make -j4 && cd ..
 ```
 
 # Teleop
@@ -93,6 +104,11 @@ cd webviz && ./bin/websocket --config_file=../config/cobot_webviz_config.lua --v
 # Launch Enml
 ```
 cd enml && ./bin/enml -c ../config -r enml.lua
+```
+
+# Launch Graph Nav
+```
+cd graph_navigation && ./bin/navigation -robot_config ../config/navigation.lua
 ```
 
 # Known Issues
