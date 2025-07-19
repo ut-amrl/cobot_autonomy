@@ -1,6 +1,9 @@
 # cobot_autonomy
 UT AMRL stack for Cobot MoMa
 
+# Container Setup
+See [CONTAINER.md](CONTAINER.md)
+
 # Installation
 To compile the messages:
 ```
