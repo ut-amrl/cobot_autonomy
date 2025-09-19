@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 project(cobot_linux)
 
+# SIMDe support (drop-in SSE -> NEON/scalar translator)
+set(SIMDE_DIR "${CMAKE_SOURCE_DIR}/third_party/simde")
+if(EXISTS "${SIMDE_DIR}")
+  message(STATUS "SIMDe found: ${SIMDE_DIR}")
+  add_compile_definitions(SIMDE_ENABLE_NATIVE_ALIASES=1)
+  include_directories(${SIMDE_DIR})
+endif()
+
 # Output paths
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)

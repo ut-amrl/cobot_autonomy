@@ -13,3 +13,6 @@
 [submodule "graph_navigation"]
 	path = graph_navigation
 	url = https://github.com/ut-amrl/graph_navigation.git
+[submodule "cobot_linux/third_party/simde"]
+	path = cobot_linux/third_party/simde
+	url = https://github.com/simd-everywhere/simde

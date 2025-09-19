@@ -18,8 +18,16 @@
 
 #include <cmath>
 #include "util.h"
-#include <xmmintrin.h>
-#include <smmintrin.h>
+#if defined(__x86_64__) || defined(__i386__)
+  #include <xmmintrin.h>
+#else
+  #include <simde/x86/sse.h>
+#endif
+#if defined(__x86_64__) || defined(__i386__)
+  #include <smmintrin.h>
+#else
+  #include <simde/x86/sse4.1.h>
+#endif
 
 #define V3COMP(p) (p).x,(p).y,(p).z
 #define V2COMP(p) (p).x,(p).y
