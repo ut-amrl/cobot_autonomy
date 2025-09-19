@@ -129,7 +129,7 @@ elseif(${ROS_VERSION} EQUAL "2")
 
   # Install the generated interface files and any message, srv, or action files.
   install(
-    DIRECTORY msg srv action
+    DIRECTORY msg srv
     DESTINATION share/${PROJECT_NAME}
   )
 
