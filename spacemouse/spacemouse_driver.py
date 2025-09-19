@@ -4,6 +4,10 @@ import signal
 from enum import Enum, auto
 import numpy as np
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
+
 # kinova arm imports
 from utils.arm_utils import parseConnectionArguments, DeviceConnection
 from utils.arm_utils import send_gripper_action, send_cartesian_twist
